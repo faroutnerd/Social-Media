@@ -10,6 +10,7 @@ import Profile from './pages/Profile'
 import CreatePost from './pages/CreatePost'
 import Messages from './pages/Messages'
 import Layout from './pages/Layout'
+import {Toaster} from 'react-hot-toast'
 
 import { useUser } from '@clerk/clerk-react'
 
@@ -19,6 +20,7 @@ const App = () => {
 
   return (
     <>
+      <Toaster />
       <Routes>
         <Route path='/' element={!user ? <Login /> : <Layout/>}>
           <Route index element={<Feed />} />
