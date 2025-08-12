@@ -1,10 +1,11 @@
 import express from 'express';
 import cors from 'cors';
 import 'dotenv/config';
-
-import connectDB from './configs/db.js';
+import { clerkMiddleware } from '@clerk/express'
 import {inngest, functions} from './inngest/index.js';
 import {serve} from 'inngest/express';
+import connectDB from './configs/db.js';
+import userRouter from './routes/user.route.js'
 
 const app = express();
 
@@ -13,6 +14,8 @@ await connectDB();
 // Middlewares
 app.use(cors());
 app.use(express.json());
+app.use(clerkMiddleware());  // Clerk Middleware -- To check every request of the user.
+app.use('/api/user', userRouter);
 
 //Routes
 app.get('/', (req, res) => res.send('Your application is running'));
