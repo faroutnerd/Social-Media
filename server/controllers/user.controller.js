@@ -27,7 +27,7 @@ export const updateUserData = async (req, res) => {
     try {
 
         const {userId} = req.auth();
-        const {username, bio, location, full_name} = req.body;
+        let {username, bio, location, full_name} = req.body;    // 
 
         const tempUser = await User.findById(userId);
 
@@ -50,6 +50,13 @@ export const updateUserData = async (req, res) => {
 
         const profile = req.files.profile && req.files.profile[0]
         const cover = req.files.cover && req.files.cover[0]
+
+        // const profile = req.files?.profile?.[0];
+        // const cover = req.files?.cover?.[0];
+
+        console.log("FILES:", req.files);
+        console.log("BODY:", req.body);
+
 
         if(profile) {
             const buffer = fs.readFileSync(profile.path)
