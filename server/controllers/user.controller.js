@@ -1,5 +1,6 @@
 import { imagekit } from "../configs/imagekit.js";
 import Connection from "../models/connection.model.js";
+import Post from "../models/post.model.js";
 import User from "../models/user.model.js";
 import fs from 'fs'
 
@@ -57,6 +58,7 @@ export const updateUserData = async (req, res) => {
             const response = await imagekit.upload({
                 file: buffer,
                 fileName: profile.originalname,
+                folder: 'profile'
             })
 
             const url = imagekit.url({
@@ -75,6 +77,7 @@ export const updateUserData = async (req, res) => {
             const response = await imagekit.upload({
                 file: buffer,
                 fileName: cover.originalname,
+                folder: 'cover'
             })
 
             const url = imagekit.url({
@@ -279,3 +282,23 @@ export const acceptConnectionRequest = async (req, res) => {
     }
 }
 
+// get user profile
+export const getUserProfiles = async (req, res) => {
+    try {
+
+        const {profileId} = req.body;
+        const profile = await User.findById(profileId)
+        if(!profile) {
+            return res.status(400).json({success: false, message: 'User not found.'})
+        }
+
+        const posts = await Post.find({user: profileId}).populate('user');
+
+        return res.status(200).json({success: true, profile, posts})
+        
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({success: false, message: error.message})
+        
+    }
+}
