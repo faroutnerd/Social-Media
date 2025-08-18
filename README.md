@@ -20,7 +20,7 @@ A full-stack **MERN social media application** where users can:
 Deployed with **Vercel** and powered by **REST APIs + Inngest** for background jobs.  
 
 ### 📸 Screenshot
-![1536w light](https://github.com/user-attachments/assets/c8e54a93-cf81-4065-96e2-3e273bb0fb70)(https://social-media-blond-psi.vercel.app)
+[![1536w light](https://github.com/user-attachments/assets/c8e54a93-cf81-4065-96e2-3e273bb0fb70)](https://social-media-blond-psi.vercel.app)
 
 ---
 
