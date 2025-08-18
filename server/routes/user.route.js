@@ -22,7 +22,8 @@ router.post('/accept', protect, acceptConnectionRequest);
 
 router.get('/connections', protect, getUserConnections);
 
-router.post('/posts', getUserProfiles);
+// router.post('/posts', getUserProfiles);
+router.post('/profiles', getUserProfiles)
 
 router.get('/recent-messages', protect, getUserRecentMessages);
 

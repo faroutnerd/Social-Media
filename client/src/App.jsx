@@ -13,17 +13,36 @@ import Layout from './pages/Layout'
 import {Toaster} from 'react-hot-toast'
 
 import { useUser, useAuth } from '@clerk/clerk-react'
+import { useDispatch } from 'react-redux'
+import { fetchUser } from './features/user/userSlice'
 
 const App = () => {
 
   const {user} = useUser()
   const {getToken} = useAuth();
+  const dispatch = useDispatch();
+
+  // to get the token
+  // useEffect(()=>{
+  //   if(user) {
+  //     getToken().then(token => console.log(token));
+  //   }
+  // }, [user]);
 
   useEffect(()=>{
-    if(user) {
-      getToken().then(token => console.log(token));
+    const fetchData = async () => {
+      console.log(`app: ${user}`);
+      // console.log(JSON.stringify(user));
+      const token = await getToken();
+      console.log("🔑 Clerk Token:", token);  // 👈 log token
+      
+      if(user) {
+        const token = await getToken();
+        dispatch(fetchUser(token))
+      }
     }
-  }, [user])
+    fetchData();
+  }, [user, getToken, dispatch]);
 
   return (
     <>

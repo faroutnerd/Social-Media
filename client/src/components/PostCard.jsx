@@ -3,13 +3,15 @@ import { BadgeCheck, Heart, MessageCircle, MessageCircleHeart, Send, Share2 } fr
 import moment from 'moment'
 import { dummyUserData } from '../assets/assets'
 import { useNavigate } from 'react-router-dom'
+import { useSelector } from 'react-redux'
 
 const PostCard = ({post}) => {
 
   const navigate = useNavigate();
 
   const [likes, setLikes] = useState(post.likes_count)
-  const currentUser = dummyUserData
+  // const currentUser = dummyUserData
+  const currentUser = useSelector((state) => state.user.value)
   
   const postWithHashtags = post.content.replace(/(#\w+)/g, '<span class="text-indigo-600">$1</span>')
 
