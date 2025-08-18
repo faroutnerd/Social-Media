@@ -127,7 +127,8 @@ npm start
 ```
 
 📸 Screenshots
-![Uploading Background (1).png…]()
+![Background](https://github.com/user-attachments/assets/2dea10ab-9e36-4c50-824e-085590a289cc)
+
 
 
 ### 🚧 Future Improvements
