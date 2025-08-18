@@ -5,7 +5,6 @@
 [![ImageKit](https://img.shields.io/badge/Media-ImageKit-orange?style=for-the-badge&logo=imagekit&logoColor=white)](https://imagekit.io)  
 [![Inngest](https://img.shields.io/badge/Workflow-Inngest-purple?style=for-the-badge&logo=githubactions&logoColor=white)](https://www.inngest.com)  
 [![Vercel](https://img.shields.io/badge/Hosted%20On-Vercel-black?style=for-the-badge&logo=vercel&logoColor=white)](https://vercel.com)  
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](./LICENSE)  
 
 ---
 
@@ -20,6 +19,9 @@ A full-stack **MERN social media application** where users can:
 
 Deployed with **Vercel** and powered by **REST APIs + Inngest** for background jobs.  
 
+### 📸 Screenshot
+![1536w light](https://github.com/user-attachments/assets/c8e54a93-cf81-4065-96e2-3e273bb0fb70)(https://social-media-blond-psi.vercel.app)
+
 ---
 
 ## 📑 Table of Contents  
@@ -29,9 +31,8 @@ Deployed with **Vercel** and powered by **REST APIs + Inngest** for background j
 - [Project Setup](#-project-setup)  
   - [Client Environment](#client-env)  
   - [Server Environment](#server-env)  
-- [Screenshots](#-screenshots)  
-- [Future Improvements](#-future-improvements)  
-- [License](#-license)  
+ 
+
 
 ---
 
@@ -125,21 +126,3 @@ Backend:
 cd server
 npm start
 ```
-
-📸 Screenshots
-![Background](https://github.com/user-attachments/assets/2dea10ab-9e36-4c50-824e-085590a289cc)
-
-
-
-### 🚧 Future Improvements
-🔔 Push notifications
-👥 Group chats
-🌙 Dark mode
-📂 Story highlights
-
-
-
-
-
-
-
