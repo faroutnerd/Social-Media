@@ -2,6 +2,7 @@ import express from 'express'
 import { acceptConnectionRequest, discoverUser, followUser, getUserConnections, getUserData, getUserProfiles, sendConnectionRequest, unfollowUser, updateUserData } from '../controllers/user.controller.js';
 import { protect } from '../middlewares/auth.middleware.js';
 import { upload } from '../configs/multer.js';
+import { getUserRecentMessages } from '../controllers/message.controller.js';
 
 const router = express.Router();
 
@@ -22,5 +23,7 @@ router.post('/accept', protect, acceptConnectionRequest);
 router.get('/connections', protect, getUserConnections);
 
 router.post('/posts', getUserProfiles);
+
+router.get('/recent-messages', protect, getUserRecentMessages);
 
 export default router;
