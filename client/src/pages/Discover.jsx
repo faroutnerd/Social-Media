@@ -3,25 +3,53 @@ import { dummyConnectionsData } from '../assets/assets';
 import { Search } from 'lucide-react';
 import UserCard from '../components/UserCard';
 import Loading from '../components/Loading';
+import { useAuth } from '@clerk/clerk-react';
+import { useDispatch } from 'react-redux';
+import { fetchUser } from '../features/user/userSlice';
+import api from '../api/axios';
+import toast from 'react-hot-toast';
 
 const Discover = () => {
 
+  const {getToken} = useAuth();
+  const dispatch = useDispatch();
+
   const [input, setInput] = useState('');
-  const [users, setUsers] = useState(dummyConnectionsData)
+  const [users, setUsers] = useState([])
   const [loading, setLoading] = useState(false);
 
   const handleSearch = async (e) => {
     if(e.key === 'Enter') {
-      setUsers([]);
-      setLoading(true);
-      setTimeout(() => {
-        setUsers(dummyConnectionsData);
+      try {
+
+        setUsers([]);
+        setLoading(true)
+        const {data} = await api.post('/api/user/discover', {input}, {
+          headers: {Authorization: `Bearer ${await getToken()}`}
+        });
+
+        // data.success ? setUsers(data.users) : toast.error(data.message);
+        if (data.success) {
+          setUsers(data.filteredUsers || []);   // fallback if users is undefined/null
+        } else {
+          toast.error(data.message);
+          setUsers([]);                 // reset to empty array on error
+        }
+        setInput('');
+        
+      } catch (error) {
+        toast.error(error.message);
+      } finally {
         setLoading(false);
-      }, 1000)
+      }
     }
   }
 
-  // useEffect(()=>{}, [])
+  useEffect(()=>{
+    getToken().then((token)=>{
+      dispatch(fetchUser(token))
+    })
+  }, [])
 
   return (
     <div className='min-h-screen bg-gradient-to-b from-slate-50 to-white'>
@@ -44,7 +72,7 @@ const Discover = () => {
         </div>
 
         {/* Body */}
-        <div className='flex flex-wrap gap-6'>
+        {/* <div className='flex flex-wrap gap-6'>
           {
             users.map((user)=>(
               <UserCard key={user._id} user={user} />
@@ -52,9 +80,23 @@ const Discover = () => {
           }
         </div>
 
+        */}
+
+        
+
+        {Array.isArray(users) && users.length > 0 ? (
+          <div className="flex flex-wrap gap-6">
+            {users.map((user) => (
+              <UserCard key={user._id} user={user} />
+            ))}
+          </div>
+        ) : (
+          !loading && <p className="text-slate-500 text-center mt-10">No users found.</p>
+        )}
+
         {
           loading && (<Loading height='60vh' />)
-        }
+        } 
 
       </div>
     </div>

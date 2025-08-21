@@ -4,18 +4,56 @@ import moment from 'moment'
 import { dummyUserData } from '../assets/assets'
 import { useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
+import { useAuth } from '@clerk/clerk-react'
+import api from '../api/axios'
+import toast from 'react-hot-toast'
 
 const PostCard = ({post}) => {
 
+  const {getToken} = useAuth();
+
   const navigate = useNavigate();
 
-  const [likes, setLikes] = useState(post.likes_count)
+  // const [likes, setLikes] = useState(post.likes_count)
+  const [likes, setLikes] = useState(post.likes_count || []); // ensure it's an array
+
   // const currentUser = dummyUserData
   const currentUser = useSelector((state) => state.user.value)
   
-  const postWithHashtags = post.content.replace(/(#\w+)/g, '<span class="text-indigo-600">$1</span>')
+  const postWithHashtags = post.content.replace(/(#\w+)/g, '<span class="text-indigo-600">$1</span>');
 
   const handleLike = async () => {
+
+    try {
+
+      const {data} = await api.post('/api/post/like', {postId: post._id}, {
+        headers: {Authorization: `Bearer ${await getToken()}`}
+      });
+
+      if(data.success) {
+        toast.success(data.message);
+        setLikes(prev => {
+          if(prev.includes(currentUser._id)){
+            return prev.filter(id => id !== currentUser._id)
+          } else {
+            return [...prev, currentUser._id]
+          }
+        })
+      } else {
+        toast(data.message);
+      }
+      
+    } catch (error) {
+      toast.error(data.message)
+    }
+
+  }
+
+  const handleComment = async () => {
+
+  }
+
+  const handleSendPost = () => {
 
   }
 
@@ -51,12 +89,12 @@ const PostCard = ({post}) => {
         </div>
 
         <div className='flex items-center gap-1'>
-          <MessageCircle onClick={handleLike} className='w-5 h-5' />
+          <MessageCircle onClick={handleComment} className='w-5 h-5' />
           <span>{12}</span>
         </div>
 
         <div className='flex items-center gap-1'>
-          <Send onClick={handleLike} className='w-5 h-5' />
+          <Send onClick={handleSendPost} className='w-5 h-5' />
           <span>{12}</span>
         </div>
       </div>
