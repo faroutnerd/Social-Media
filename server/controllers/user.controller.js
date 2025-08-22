@@ -195,59 +195,149 @@ export const unfollowUser = async (req, res) => {
 
 // Send Connection Request
 export const sendConnectionRequest = async (req, res) => {
-    try {
+  try {
+    const { userId } = req.auth();
+    const { id } = req.body;
 
-        const {userId} = req.auth();
-        const {id} = req.body;
-
-        // ✅ Prevent self-connection
-        if (userId === id) {
-        return res.status(400).json({
-            success: false,
-            message: "You cannot send a connection request to yourself.",
-        });
-        }
-
-        // Check if user has sent more than 20 connection request in the last 24 hours 
-        const last24Hours = new Date(Date.now() - 24 * 60 * 60 * 1000);
-        const connectionRequest =  await Connection.find({from_user_id: userId, createdAt: {$gte: last24Hours}})
-
-        if(connectionRequest.length > 20) {
-            return res.status(400).json({success: false, message: 'You have sent too many connection requests in the last 24 hours'})
-        }
-
-        // Check if users are already connected
-        const connection = await Connection.findOne({
-            $or: [
-                {from_user_id: userId, to_user_id: id},
-                {from_user_id: id, to_user_id: userId}
-            ]
-        });
-
-        if(!connection) {
-            const newConnection = await Connection.create({
-                from_user_id: userId,
-                to_user_id: id
-            });
-
-            // Send event to Inngest for async processing
-            await inngest.send({
-                name: 'app/connection-request',
-                data: {connectionId: newConnection._id}
-            })
-
-            return res.status(200).json({success: true, message: 'Connection request sent successfully.'})
-        } else if(connection && connection.status === 'accepted') {
-            return res.status(400).json({success: false, message: 'You are already connected with this user.'})
-        }
-
-        return res.status(200).json({success: true, message: 'Connection request is pending..'})
-
-    } catch (error) {
-        console.log(error);
-        res.status(500).json({success : false , message : error.message})
+    // ✅ Prevent self-connection
+    if (userId === id) {
+      return res.status(400).json({
+        success: false,
+        message: "You cannot send a connection request to yourself.",
+      });
     }
-}
+
+    // ✅ Check daily connection request limit (max 20)
+    const last24Hours = new Date(Date.now() - 24 * 60 * 60 * 1000);
+    const connectionRequestCount = await Connection.countDocuments({
+      from_user_id: userId,
+      createdAt: { $gte: last24Hours },
+    });
+
+    if (connectionRequestCount >= 20) {
+      return res.status(429).json({
+        success: false,
+        message: "You have reached the daily limit of 20 connection requests.",
+      });
+    }
+
+    // ✅ Check if there’s already a connection record between the two users
+    const connection = await Connection.findOne({
+      $or: [
+        { from_user_id: userId, to_user_id: id },
+        { from_user_id: id, to_user_id: userId },
+      ],
+    });
+
+    if (!connection) {
+      // 🆕 No connection yet → create a new one (status = 'pending' by default)
+      const newConnection = await Connection.create({
+        from_user_id: userId,
+        to_user_id: id,
+      });
+
+      // Send event to Inngest for async processing
+      await inngest.send({
+        name: "app/connection-request",
+        data: { connectionId: newConnection._id },
+      });
+
+      return res.status(200).json({
+        success: true,
+        status: "pending",
+        message: "Connection request sent successfully.",
+      });
+    }
+
+    // 🔒 Already connected
+    if (connection.status === "accepted") {
+      return res.status(200).json({
+        success: true,
+        status: "accepted",
+        message: "You are already connected with this user.",
+      });
+    }
+
+    // ⏳ Connection request is already pending
+    if (connection.status === "pending") {
+      return res.status(200).json({
+        success: true,
+        status: "pending",
+        message: "Connection request is already pending.",
+      });
+    }
+
+    // 👀 In case you add more statuses later (e.g., "rejected")
+    return res.status(400).json({
+      success: false,
+      status: connection.status,
+      message: `Connection status is '${connection.status}'.`,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message: error.message || "Something went wrong while sending request.",
+    });
+  }
+};
+
+
+// // Send Connection Request
+// export const sendConnectionRequest = async (req, res) => {
+//     try {
+
+//         const {userId} = req.auth();
+//         const {id} = req.body;
+
+//         // ✅ Prevent self-connection
+//         if (userId === id) {
+//         return res.status(400).json({
+//             success: false,
+//             message: "You cannot send a connection request to yourself.",
+//         });
+//         }
+
+//         // Check if user has sent more than 20 connection request in the last 24 hours 
+//         const last24Hours = new Date(Date.now() - 24 * 60 * 60 * 1000);
+//         const connectionRequest =  await Connection.find({from_user_id: userId, createdAt: {$gte: last24Hours}})
+
+//         if(connectionRequest.length > 20) {
+//             return res.status(400).json({success: false, message: 'You have sent too many connection requests in the last 24 hours'})
+//         }
+
+//         // Check if users are already connected
+//         const connection = await Connection.findOne({
+//             $or: [
+//                 {from_user_id: userId, to_user_id: id},
+//                 {from_user_id: id, to_user_id: userId}
+//             ]
+//         });
+
+//         if(!connection) {
+//             const newConnection = await Connection.create({
+//                 from_user_id: userId,
+//                 to_user_id: id
+//             });
+
+//             // Send event to Inngest for async processing
+//             await inngest.send({
+//                 name: 'app/connection-request',
+//                 data: {connectionId: newConnection._id}
+//             })
+
+//             return res.status(200).json({success: true, message: 'Connection request sent successfully.'})
+//         } else if(connection && connection.status === 'accepted') {
+//             return res.status(400).json({success: false, message: 'You are already connected with this user.'})
+//         }
+
+//         return res.status(200).json({success: true, message: 'Connection request is pending..'})
+
+//     } catch (error) {
+//         console.log(error);
+//         res.status(500).json({success : false , message : error.message})
+//     }
+// }
 
 // Get User Connections
 export const getUserConnections = async (req, res) => {
