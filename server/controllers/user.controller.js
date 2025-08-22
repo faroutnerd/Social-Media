@@ -200,6 +200,14 @@ export const sendConnectionRequest = async (req, res) => {
         const {userId} = req.auth();
         const {id} = req.body;
 
+        // ✅ Prevent self-connection
+        if (userId === id) {
+        return res.status(400).json({
+            success: false,
+            message: "You cannot send a connection request to yourself.",
+        });
+        }
+
         // Check if user has sent more than 20 connection request in the last 24 hours 
         const last24Hours = new Date(Date.now() - 24 * 60 * 60 * 1000);
         const connectionRequest =  await Connection.find({from_user_id: userId, createdAt: {$gte: last24Hours}})
@@ -222,6 +230,7 @@ export const sendConnectionRequest = async (req, res) => {
                 to_user_id: id
             });
 
+            // Send event to Inngest for async processing
             await inngest.send({
                 name: 'app/connection-request',
                 data: {connectionId: newConnection._id}
@@ -232,7 +241,7 @@ export const sendConnectionRequest = async (req, res) => {
             return res.status(400).json({success: false, message: 'You are already connected with this user.'})
         }
 
-        return res.status(400).json({success: false, message: 'Connection request is pending..'})
+        return res.status(200).json({success: true, message: 'Connection request is pending..'})
 
     } catch (error) {
         console.log(error);
