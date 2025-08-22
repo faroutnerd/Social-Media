@@ -170,11 +170,17 @@ export const unfollowUser = async (req, res) => {
         const {id} = req.body;
 
         const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'Authenticated user not found' });
+        }
         user.following = user.following.filter(user => user !== userId);
         await user.save();
 
         const toUser = await User.findById(id);
-        toUser.followers = toUser.filter(user => user !== userId);
+        if (!toUser) {
+            return res.status(404).json({ success: false, message: 'User to unfollow not found' });
+        }
+        toUser.followers = toUser.followers.filter(user => user !== userId);
         await toUser.save();
         
 
