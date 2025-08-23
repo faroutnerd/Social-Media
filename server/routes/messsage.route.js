@@ -11,4 +11,6 @@ router.post('/send', upload.single('image'), protect, sendMessage);
 
 router.post('/chat', protect, getChatMessages);
 
+// router.post('/recent-message')
+
 export default router;

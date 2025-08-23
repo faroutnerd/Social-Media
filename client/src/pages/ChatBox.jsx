@@ -12,7 +12,7 @@ const ChatBox = () => {
 
   const {messages} = useSelector((state) => state.messages);
   const {userId} = useParams();
-  const getToken = useAuth();
+  const {getToken} = useAuth();
   const dispatch = useDispatch();
 
   const [text, setText] = useState('');
@@ -28,7 +28,7 @@ const ChatBox = () => {
       const token = await getToken();
       dispatch(fetchMessages({token, userId}));
     } catch (error) {
-      toast.error(error.message);
+      toast.error(error.message + ' fetchuserMessages');
     }
   }
 

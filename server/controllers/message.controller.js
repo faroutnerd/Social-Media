@@ -64,14 +64,14 @@ export const sendMessage = async (req, res) => {
           message_type
         })
 
-        return res.status(200).json({success : true , message});
-
         // Send message to to_user_id using SSE
         const messageWithUserData = await Message.findById(message._id).populate('from_user_id');
 
         if(connections[to_user_id]) {
             connections[to_user_id].write(`data: ${JSON.stringify(messageWithUserData)}\n\n`);
         }
+
+        return res.status(200).json({success : true , message});
 
     } catch (error) {
         console.log(error);
