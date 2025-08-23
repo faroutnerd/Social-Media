@@ -9,8 +9,6 @@ router.get('/:userId', sseController);
 
 router.post('/send', upload.single('image'), protect, sendMessage);
 
-router.post('/chat', protect, getChatMessages);
-
-// router.post('/recent-message')
+router.post('/get', protect, getChatMessages);
 
 export default router;
