@@ -122,7 +122,7 @@
 
 import fs from "fs";
 import Message from "../models/Message.js";
-import imageKit from "../configs/imageKit.js";
+import { imageKit } from '../configs/imagekit.js';
 
 // Empty object to store server-side event connections
 const connections = {};
