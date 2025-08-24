@@ -121,7 +121,7 @@
 
 
 import fs from "fs";
-import Message from "../models/connection.model.js";
+import Message from "../models/message.model.js";
 import { imagekit } from '../configs/imagekit.js';
 
 // Empty object to store server-side event connections

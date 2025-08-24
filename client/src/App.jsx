@@ -37,8 +37,8 @@ const App = () => {
     const fetchData = async () => {
       // console.log(`app: ${user}`);
       // console.log(JSON.stringify(user));
-      // const token = await getToken();
-      // console.log("🔑 Clerk Token:", token);  // 👈 log token
+      const token = await getToken();
+      console.log("🔑 Clerk Token:", token);  // 👈 log token
       
       if(user) {
         const token = await getToken();
