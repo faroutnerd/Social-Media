@@ -158,8 +158,8 @@ export const sendMessage = async (req, res) => {
         const { to_user_id, text } = req.body;
         const image = req.file;
 
-        console.log("Clerk userId:", userId);
-        console.log("Request to_user_id:", to_user_id);
+        // console.log("Clerk userId:", userId);
+        // console.log("Request to_user_id:", to_user_id);
 
 
         let media_url = "";
@@ -169,7 +169,8 @@ export const sendMessage = async (req, res) => {
             const fileBuffer = fs.readFileSync(media.path);
             const response = await imagekit.upload({
                 file: fileBuffer,
-                fileName: media.originalname,
+                fileName: image.originalname,
+                folder: "messages",
             });
             media_url = imagekit.url({
                 path: response.path,
@@ -210,9 +211,8 @@ export const getChatMessages = async (req, res) => {
         const { userId } = req.auth();
         const { to_user_id } = req.body;
 
-        console.log("Clerk userId:", userId);
-        console.log("Request to_user_id:", to_user_id);
-
+        // console.log("Clerk userId:", userId);
+        // console.log("Request to_user_id:", to_user_id);
 
         const messages = await Message.find({
             $or: [
