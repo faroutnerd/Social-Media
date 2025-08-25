@@ -59,7 +59,7 @@ export const updateUserData = async (req, res) => {
             const response = await imagekit.upload({
                 file: buffer,
                 fileName: profile.originalname,
-                folder: 'profile'
+                folder: 'social-media-profile'
             })
 
             const url = imagekit.url({
@@ -78,7 +78,7 @@ export const updateUserData = async (req, res) => {
             const response = await imagekit.upload({
                 file: buffer,
                 fileName: cover.originalname,
-                folder: 'cover'
+                folder: 'social-media-cover-image'
             })
 
             const url = imagekit.url({
@@ -173,14 +173,16 @@ export const unfollowUser = async (req, res) => {
         if (!user) {
             return res.status(404).json({ success: false, message: 'Authenticated user not found' });
         }
-        user.following = user.following.filter(user => user !== userId);
+        // user.following = user.following.filter(user => user !== userId);
+        user.following = user.following.filter(uid => uid.toString() !== id);
         await user.save();
 
         const toUser = await User.findById(id);
         if (!toUser) {
             return res.status(404).json({ success: false, message: 'User to unfollow not found' });
         }
-        toUser.followers = toUser.followers.filter(user => user !== userId);
+        // toUser.followers = toUser.followers.filter(user => user !== userId);
+        toUser.followers = toUser.followers.filter(uid => uid.toString() !== userId);
         await toUser.save();
         
 
@@ -281,63 +283,6 @@ export const sendConnectionRequest = async (req, res) => {
     });
   }
 };
-
-
-// // Send Connection Request
-// export const sendConnectionRequest = async (req, res) => {
-//     try {
-
-//         const {userId} = req.auth();
-//         const {id} = req.body;
-
-//         // ✅ Prevent self-connection
-//         if (userId === id) {
-//         return res.status(400).json({
-//             success: false,
-//             message: "You cannot send a connection request to yourself.",
-//         });
-//         }
-
-//         // Check if user has sent more than 20 connection request in the last 24 hours 
-//         const last24Hours = new Date(Date.now() - 24 * 60 * 60 * 1000);
-//         const connectionRequest =  await Connection.find({from_user_id: userId, createdAt: {$gte: last24Hours}})
-
-//         if(connectionRequest.length > 20) {
-//             return res.status(400).json({success: false, message: 'You have sent too many connection requests in the last 24 hours'})
-//         }
-
-//         // Check if users are already connected
-//         const connection = await Connection.findOne({
-//             $or: [
-//                 {from_user_id: userId, to_user_id: id},
-//                 {from_user_id: id, to_user_id: userId}
-//             ]
-//         });
-
-//         if(!connection) {
-//             const newConnection = await Connection.create({
-//                 from_user_id: userId,
-//                 to_user_id: id
-//             });
-
-//             // Send event to Inngest for async processing
-//             await inngest.send({
-//                 name: 'app/connection-request',
-//                 data: {connectionId: newConnection._id}
-//             })
-
-//             return res.status(200).json({success: true, message: 'Connection request sent successfully.'})
-//         } else if(connection && connection.status === 'accepted') {
-//             return res.status(400).json({success: false, message: 'You are already connected with this user.'})
-//         }
-
-//         return res.status(200).json({success: true, message: 'Connection request is pending..'})
-
-//     } catch (error) {
-//         console.log(error);
-//         res.status(500).json({success : false , message : error.message})
-//     }
-// }
 
 // Get User Connections
 export const getUserConnections = async (req, res) => {

@@ -20,7 +20,7 @@ export const addPost = async (req, res) => {
                     const response = await imagekit.upload({
                                     file: fileBuffer,
                                     fileName: image.originalname,
-                                    folder: 'posts'
+                                    folder: 'social-media-posts'
                                 })
                     
                                 const url = imagekit.url({

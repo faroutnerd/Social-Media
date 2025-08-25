@@ -170,7 +170,7 @@ export const sendMessage = async (req, res) => {
             const response = await imagekit.upload({
                 file: fileBuffer,
                 fileName: image.originalname,
-                folder: "messages",
+                folder: "social-media-messages",
             });
             media_url = imagekit.url({
                 path: response.filePath,
@@ -193,8 +193,14 @@ export const sendMessage = async (req, res) => {
             message._id
         ).populate("from_user_id");
 
-        if (connections[userId]) {
-            connections[userId].write(
+        // if (connections[userId]) {
+        //     connections[userId].write(
+        //         `data: ${JSON.stringify(messageWithUserData)}\n\n`
+        //     );
+        // }
+
+        if (connections[to_user_id]) {
+            connections[to_user_id].write(
                 `data: ${JSON.stringify(messageWithUserData)}\n\n`
             );
         }
@@ -223,7 +229,7 @@ export const getChatMessages = async (req, res) => {
 
         // Mark messages as seen
         await Message.updateMany(
-            { from_user_id: to_user_id, to_user_id: userId },
+            { from_user_id: to_user_id, to_user_id: userId, seen: false },
             { seen: true }
         );
 
