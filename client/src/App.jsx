@@ -53,28 +53,58 @@ const App = () => {
     pathnameRef.current = pathname;
   }, [pathname]);
 
+  // useEffect(() => {
+
+  //   let eventSource;
+
+  //   if(user) {
+  //     const eventSource = new EventSource(import.meta.env.VITE_BASEURL + '/api/message/' + user.id);
+
+  //     eventSource.onmessage = (event) => {
+  //       const message = JSON.parse(event.data);
+  //       if(pathnameRef.current === ('/messages/' + message.from_user_id._id)) {
+  //         dispatch(addMessage(message));
+  //       } else {
+  //         dispatch(addMessage(message));
+  //       }
+  //     };
+  //   }
+  //   return () => {
+  //     if (eventSource) {
+  //     eventSource.close();
+  //   }
+  //   };
+  // }, [user, dispatch]);
+
   useEffect(() => {
+  if (!user) return;
 
-    let eventSource;
+  const eventSource = new EventSource(
+    `${import.meta.env.VITE_BASEURL}/api/message/${user.id}`
+  );
 
-    if(user) {
-      const eventSource = new EventSource(import.meta.env.VITE_BASEURL + '/api/message/' + user.id);
+  eventSource.onmessage = (event) => {
+    const message = JSON.parse(event.data);
 
-      eventSource.onmessage = (event) => {
-        const message = JSON.parse(event.data);
-        if(pathnameRef.current === ('/messages/' + message.from_user_id._id)) {
-          dispatch(addMessage(message));
-        } else {
-
-        }
-      };
+    // If user is currently viewing the chat
+    if (pathnameRef.current === '/messages/' + message.from_user_id._id) {
+      dispatch(addMessage(message));
+    } else {
+      // 👉 Still update global store OR show a toast/notification
+      dispatch(addMessage(message));
+      // toast.success(`New message from ${message.from_user_id.name}`)
     }
-    return () => {
-      if (eventSource) {
-      eventSource.close();
-    }
-    };
-  }, [user, dispatch]);
+  };
+
+  eventSource.onerror = (err) => {
+    console.error("SSE error:", err);
+    eventSource.close();
+  };
+
+  return () => {
+    eventSource.close();
+  };
+}, [user?.id, dispatch]);
 
   return (
     <>

@@ -173,7 +173,7 @@ export const sendMessage = async (req, res) => {
                 folder: "messages",
             });
             media_url = imagekit.url({
-                path: response.path,
+                path: response.filePath,
                 transformation: [
                     { width: "1280", format: "png", quality: "auto" },
                 ],
